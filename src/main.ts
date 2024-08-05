@@ -21,6 +21,6 @@ async function bootstrap() {
       logger.error(e);
     }
   }
-  await app.listen(3000);
+  await app.listen(env.PORT || 3000);
 }
 bootstrap();
