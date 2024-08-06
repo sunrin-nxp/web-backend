@@ -18,6 +18,11 @@ export class AuthService {
     if (user) return user; else return null;
   }
 
+  async findUser(userId: Number) {
+    const user = await userSchema.findOne({ nxpid: userId });
+    if (user) return user; else return null;
+  }
+
   create(createAuthDto: CreateAuthDto) {
     return 'This action adds a new auth';
   }
