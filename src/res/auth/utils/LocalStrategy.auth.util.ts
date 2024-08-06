@@ -4,8 +4,7 @@ import { Profile, Strategy } from 'passport-local';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '../auth.service';
 import userSchema from 'src/models/user.schema';
-import { config } from 'dotenv';
- config();
+import { config } from 'dotenv'; config();
 
 const env = process.env;
 
