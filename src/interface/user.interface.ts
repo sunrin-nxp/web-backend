@@ -3,8 +3,8 @@ interface User {
     nxppw?: String;
     description?: String;
     associated?: String;
-    mailaddr: String;
-    rank: String;
+    mailaddr?: String;
+    rank?: String;
     solved_problems?: Array<String>;
     wrong_problems?: Array<String>;
 };
