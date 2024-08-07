@@ -28,6 +28,11 @@ export class AuthController {
     };
   }
 
+  // @Post('/logout/:id')
+  // async logout(@Param('id') id: string) {
+  //   return this.authService.logout(id);
+  // }
+
   @Get()
   findAll() {
     return this.authService.findAll();
