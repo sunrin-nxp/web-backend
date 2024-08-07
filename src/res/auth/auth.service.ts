@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import userSchema from 'src/models/user.schema';
 import User from 'src/interface/user.interface';
+import bcrypt from 'bcrypt';
 import { config } from 'dotenv'; config();
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
@@ -22,7 +23,7 @@ export class AuthService {
 		if (!user) {
 			throw new HttpException("올바르지 않은 정보입니다.", 400);
 		}
-		const payload = { id: user.id, nick: user.nickname };
+		const payload = { id: user.id, nickname: user.nickname };
 		const accessToken = this.jwtService.sign(payload, {
 			secret: env.ACCESS_TOKEN_SECRET
 		});
@@ -34,12 +35,44 @@ export class AuthService {
 		return {
 			accessToken: accessToken,
 			refreshToken: refreshToken
-		}
+		};
 	}
 
 	async logout(id: string): Promise<object> {
 		this.userService.removeRefreshToken(id);
 		return;
+	}
+
+	async createUser(
+		id: string,
+		pw: string,
+		nickname: string,
+		email: string
+	): Promise<{
+		accessToken: string;
+		refreshToken: string;
+	}> {
+		const createdUser = await this.userService.createUser({
+			id: id,
+			nickname: nickname,
+			email: email
+		});
+		const hashedPw = await bcrypt.hash(pw, 10);
+		createdUser.password = hashedPw;
+
+		const payload = { id: createdUser.id, nickname: createdUser.nickname };
+		const accessToken = this.jwtService.sign(payload, {
+			secret: env.ACCESS_TOKEN_SECRET
+		});
+		const refreshToken = this.jwtService.sign(payload, {
+			secret: env.REFRESH_TOKEN_SECRET,
+			expiresIn: '7d'
+		});
+		await this.userService.setCurrentRefreshToken(refreshToken, user.id);
+		return {
+			accessToken: accessToken,
+			refreshToken: refreshToken
+		};
 	}
 
 	// LocalStrategy.auth.util.ts에서 참조
