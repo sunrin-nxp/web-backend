@@ -10,8 +10,13 @@ export class AuthController {
 
   @Post('/login')
   @UseGuards(LocalAuthGuard)
-  async handleLogin(@Request() req) {
-    return req.user;
+  async handleLogin(@Body() loginRequestDto: LoginRequestDto) {
+    const { id, pw } = loginRequestDto;
+    const result = await this.authService.login(id, pw);
+    return {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken
+    };
   }
 
   @Post()
