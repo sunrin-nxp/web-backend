@@ -9,8 +9,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/login')
-  @UseGuards(LocalAuthGuard)
-  async handleLogin(@Body() loginRequestDto: LoginRequestDto) {
+  async login(@Body() loginRequestDto: LoginRequestDto) {
     const { id, pw } = loginRequestDto;
     const result = await this.authService.login(id, pw);
     return {
@@ -19,9 +18,14 @@ export class AuthController {
     };
   }
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('/register')
+  async register(@Body() registerDto: CreateUserRequestDto) {
+    const { id, pw, email } = registerDto;
+    const result = await this.authService.createUser(id, pw, email);
+    return {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken
+    };
   }
 
   @Get()
