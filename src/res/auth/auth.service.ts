@@ -30,13 +30,18 @@ export class AuthService {
 			secret: env.REFRESH_TOKEN_SECRET,
 			expiresIn: '7d'
 		});
-		await this.setCurrentRefreshToken(refreshToken, user.id);
+		await this.userService.setCurrentRefreshToken(refreshToken, user.id);
 		return {
 			accessToken: accessToken,
 			refreshToken: refreshToken
 		}
 	}
-	
+
+	async logout(id: string): Promise<object> {
+		this.userService.removeRefreshToken(id);
+		return;
+	}
+
 	// LocalStrategy.auth.util.ts에서 참조
 	async validateUser(details: User) {
 		const user = await userSchema.findOne({
