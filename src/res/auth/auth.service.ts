@@ -76,11 +76,15 @@ export class AuthService {
 	}
 
 	// LocalStrategy.auth.util.ts에서 참조
-	async validateUser(details: User) {
-		const user = await userSchema.findOne({
-			nxpid: details.nxpid
-		});
-		if (user) return user; else return null;
+	async validateUser(id: string, pw: string): Promise<User> {
+		const uuid = await this.userService.getUUIDById(id);
+		if (uuid) {
+			const user = await this.userService.getUserPwByUUID(uuid);
+			if (user && (await bcrypt.compare(pw, user.pw))) {
+				return user;
+			}
+		}
+		return null;
 	}
 
 	async findUser(userId: Number) {
