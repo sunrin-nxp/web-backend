@@ -1,26 +1,120 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+// src/auth/auth.service.ts
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UserService } from '../user/user.service';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from '../../interface/jwt-payload.interface';
+import { CreateAuthDto } from './dto/createUser.dto';
+import userSchema from 'src/models/user.schema';
+import { readFile } from 'fs/promises';
+import { UpdateAssociationDto } from './dto/updateAssociation.dto';
+import { UpdateNicknameDto } from './dto/updateNickname.dto';
+import { UpdateDescriptionDto } from './dto/updateDesc.dto';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService
+  ) { }
+
+  async validateUser(id: string, password: string): Promise<any> {
+    const user = await this.userService.findOne(id);
+    if (user && user.nxppw === password) {
+      const { nxppw, ...result } = user;
+      return result;
+    }
+    return null;
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async login(user: any) {
+    const payload: JwtPayload = { id: user.id };
+    const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    await this.userService.setRefreshToken(user.id, refreshToken);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  async register(userData: CreateAuthDto) {
+    const newUser = await new userSchema({
+      nxpid: userData.id,
+      nxppw: userData.pw,
+      nickname: userData.nickname ?? userData.id,
+      mailaddr: userData.email
+    }).save();
+    return {
+      result: userData.id ?? null
+    };
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
+  async getImage(filename: string) {
+    const imgBuffer = await readFile(`./upload/${filename}`);
+    return imgBuffer.buffer;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async profilePhoto(imgFileName: string, userid: string) {
+    const user = await userSchema.findOne({ nxpid: userid });
+    let res = false;
+    if (user) {
+      user.profilePhoto = imgFileName;
+      await user.save().then(() => {
+        res = true;
+      }).catch((e) => {
+        res = false
+      });
+    } else res = false;
+    return {
+      result: res
+    };
+  }
+
+  async updateAssociation(data: UpdateAssociationDto) {
+    const user = await userSchema.findOne({ nxpid: data.id });
+    user.associated = data.association; await user.save();
+    return { result: true };
+  }
+
+  async updateNickname(data: UpdateNicknameDto) {
+    const user = await userSchema.findOne({ nxpid: data.id });
+    user.nickname = data.nickname; await user.save();
+    return { result: true };
+  }
+
+  async updateDescription(data: UpdateDescriptionDto) {
+    const user = await userSchema.findOne({ nxpid: data.id });
+    user.description = data.description; await user.save();
+    return { result: true };
+  }
+
+  async updateRefreshToken(id: string, refreshToken: string) {
+    await this.userService.setRefreshToken(id, refreshToken);
+  }
+
+  async logout(id: string) {
+    await this.userService.removeRefreshToken(id);
+  }
+
+  async refreshToken(refreshToken: string) {
+    const decoded = this.jwtService.verify(refreshToken);
+    const user = await this.userService.findOne(decoded.id);
+
+    if (!user || user.refreshToken !== refreshToken) {
+      throw new UnauthorizedException();
+    }
+
+    const payload: JwtPayload = { id: user.nxpid };
+    const newAccessToken = this.jwtService.sign(payload);
+    const newRefreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    await this.userService.setRefreshToken(user.nxpid.toString(), newRefreshToken);
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    };
   }
 }
