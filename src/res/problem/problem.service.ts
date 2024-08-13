@@ -1,26 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProblemDto } from './dto/create-problem.dto';
+import { ProblemDto } from './dto/createProblem.dto';
 import { UpdateProblemDto } from './dto/update-problem.dto';
+import problemsSchema from 'src/models/problems.schema';
 
 @Injectable()
 export class ProblemService {
-  create(createProblemDto: CreateProblemDto) {
+  create(createProblemDto: ProblemDto) {
     return 'This action adds a new problem';
   }
 
-  findAll() {
-    return `This action returns all problem`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} problem`;
-  }
-
-  update(id: number, updateProblemDto: UpdateProblemDto) {
-    return `This action updates a #${id} problem`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} problem`;
+  async getProblem(no: number) {
+    let problem = await problemsSchema.findOne({ problemNumber: no });
+    if (!problem) problem = null;
+    return problem;
   }
 }
