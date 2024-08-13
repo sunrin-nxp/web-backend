@@ -8,7 +8,7 @@ const userSchema = new mongo.Schema({
     associated: { type: String, default: "" },
     mailaddr: { type: String, required: true },
     profilePhoto: { type: String, required: true }, // 저장된 파일명
-    rank: { type: String, default: "none"},
+    rank: { type: String, default: "none" },
     solved_problems: { type: Array<Number>  },
     wrong_problems: { type: Array<Number> },
     my_problems: { type: Array<Number> },
