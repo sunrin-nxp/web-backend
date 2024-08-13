@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../../interface/jwt-payload.interface';
 import { CreateAuthDto } from './dto/createUser.dto';
 import userSchema from 'src/models/user.schema';
+import { readFile } from 'fs/promises';
 
 @Injectable()
 export class AuthService {
@@ -44,6 +45,27 @@ export class AuthService {
     }).save();
     return {
       result: userData.id ?? null
+    };
+  }
+
+  async getImage(filename: string) {
+    const imgBuffer = await readFile(`./upload/${filename}`);
+    return imgBuffer.buffer;
+  }
+
+  async profilePhoto(imgFileName: string, userid: string) {
+    const user = await userSchema.findOne({ nxpid: userid });
+    let res = false;
+    if (user) {
+      user.profilePhoto = imgFileName;
+      await user.save().then(() => {
+        res = true;
+      }).catch((e) => {
+        res = false
+      });
+    } else res = false;
+    return {
+      result: res
     };
   }
 
