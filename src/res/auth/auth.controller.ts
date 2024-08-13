@@ -1,5 +1,5 @@
 // src/auth/auth.controller.ts
-import { Request, Controller, Post, UseGuards, Res, Body, UploadedFile, Req } from '@nestjs/common';
+import { Request, Controller, Post, UseGuards, Res, Body, UploadedFile, Req, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -9,6 +9,8 @@ import * as multer from 'multer';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
+import { prototype } from 'events';
+import path from 'path';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -16,7 +18,9 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const userid = req.body.id;
-    const filename = `${userid}-profile-${crypto.randomBytes(16).toString('hex')}`
+    const ext = path.extname(file.originalname);
+    const filename = `${userid}-profile-${crypto.randomBytes(16).toString('hex')}${ext}`
+    cb(null, filename);
   }
 });
 
@@ -48,6 +52,11 @@ export class AuthController {
     return this.authService.register(bd);
   }
 
+  @Post('profile/:id')
+  async profilePhoto(@UploadedFile() file: Express.Multer.File, @Param('id') userid: string) {
+    return this.authService.profilePhoto(file.filename, userid);
+  }
+
   @Post('refresh')
   async refresh(@Body('refreshToken') refreshToken: string, @Res() res: Response) {
     const tokens = await this.authService.refreshToken(refreshToken);
@@ -70,4 +79,6 @@ export class AuthController {
     res.clearCookie('refreshToken');
     return res.json({ message: 'Logged out successfully' });
   }
+
+  
 }
