@@ -1,10 +1,28 @@
 // src/auth/auth.controller.ts
-import { Controller, Request, Post, UseGuards, Res, Body } from '@nestjs/common';
+import { Request, Controller, Post, UseGuards, Res, Body, UploadedFile, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Response } from 'express';
 import { CreateAuthDto } from './dto/createUser.dto';
+import * as multer from 'multer';
+import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './upload/profiles');
+  },
+  filename: (req, file, cb) => {
+    const userid = req.body.id;
+    const filename = `${userid}-profile-${crypto.randomBytes(16).toString('hex')}`
+  }
+});
+
+const uploadOptions: MulterOptions = {
+  storage: storage
+};
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +45,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() bd: CreateAuthDto) {
-
+    return this.authService.register(bd);
   }
 
   @Post('refresh')
