@@ -11,10 +11,10 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async validateUser(id: string, pass: string): Promise<any> {
+  async validateUser(id: string, password: string): Promise<any> {
     const user = await this.userService.findOne(id);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
+    if (user && user.nxppw === password) {
+      const { nxppw, ...result } = user;
       return result;
     }
     return null;
@@ -33,6 +33,10 @@ export class AuthService {
     };
   }
 
+  async register() {
+    
+  }
+
   async updateRefreshToken(id: string, refreshToken: string) {
     await this.userService.setRefreshToken(id, refreshToken);
   }
@@ -49,11 +53,11 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const payload: JwtPayload = { id: user.id };
+    const payload: JwtPayload = { id: user.nxpid };
     const newAccessToken = this.jwtService.sign(payload);
     const newRefreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
-    await this.userService.setRefreshToken(user.id, newRefreshToken);
+    await this.userService.setRefreshToken(user.nxpid.toString(), newRefreshToken);
 
     return {
       accessToken: newAccessToken,

@@ -11,6 +11,7 @@ interface User {
     wrong_problems?: Array<Number>;
     my_problems?: Array<Number>;
     contributed_problems?: Array<Number>;
+    refreshToken: String;
 };
 
 export default User;
