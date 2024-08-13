@@ -11,6 +11,9 @@ import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { prototype } from 'events';
 import path from 'path';
+import { UpdateAssociationDto } from './dto/updateAssociation.dto';
+import { UpdateNicknameDto } from './dto/updateNickname.dto';
+import { UpdateDescriptionDto } from './dto/updateDesc.dto';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -80,5 +83,21 @@ export class AuthController {
     return res.json({ message: 'Logged out successfully' });
   }
 
-  
+  @UseGuards(JwtAuthGuard)
+  @Post('update/association')
+  async updateAssociation(@Body() bd: UpdateAssociationDto) {
+    return this.authService.updateAssociation(bd);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('update/nickname')
+  async updateNickname(@Body() bd: UpdateNicknameDto) {
+    return this.authService.updateNickname(bd);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('update/description')
+  async updateDescription(@Body() bd: UpdateDescriptionDto) {
+    return this.authService.updateDescription(bd);
+  }
 }
