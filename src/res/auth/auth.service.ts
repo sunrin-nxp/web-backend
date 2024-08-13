@@ -3,13 +3,15 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../../interface/jwt-payload.interface';
+import { CreateAuthDto } from './dto/createUser.dto';
+import userSchema from 'src/models/user.schema';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService
-  ) {}
+  ) { }
 
   async validateUser(id: string, password: string): Promise<any> {
     const user = await this.userService.findOne(id);
@@ -33,8 +35,16 @@ export class AuthService {
     };
   }
 
-  async register() {
-    
+  async register(userData: CreateAuthDto) {
+    const newUser = await new userSchema({
+      nxpid: userData.id,
+      nxppw: userData.pw,
+      nickname: userData.nickname ?? userData.id,
+      mailaddr: userData.email
+    }).save();
+    return {
+      result: userData.id ?? null
+    };
   }
 
   async updateRefreshToken(id: string, refreshToken: string) {

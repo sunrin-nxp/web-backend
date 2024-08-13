@@ -7,13 +7,13 @@ const userSchema = new mongo.Schema({
     description: { type: String, default: "" },
     associated: { type: String, default: "" },
     mailaddr: { type: String, required: true },
-    profilePhoto: { type: String, required: true }, // 저장된 파일명
+    profilePhoto: { type: String, default: "default.png" }, // 저장된 파일명
     rank: { type: String, default: "none" },
-    solved_problems: { type: Array<Number>  },
-    wrong_problems: { type: Array<Number> },
-    my_problems: { type: Array<Number> },
-    contributed_problems: { type: Array<Number> },
-    refreshToken: { type: String, required: true },
+    solved_problems: { type: Array<Number>, default: [] },
+    wrong_problems: { type: Array<Number>, default: [] },
+    my_problems: { type: Array<Number>, default: [] },
+    contributed_problems: { type: Array<Number>, default: [] },
+    refreshToken: { type: String, default: "" },
 });
 
 export default mongo.model('user_data', userSchema);
