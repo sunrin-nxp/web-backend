@@ -1,29 +1,28 @@
 // src/user/user.service.ts
 import { Injectable } from '@nestjs/common';
-import { User } from './entities/user.entity';
+import User from 'src/interface/user.interface';
+import userSchema from 'src/models/user.schema';
 
 @Injectable()
 export class UserService {
-  private readonly users: User[] = [
-    { id: 'john', password: 'changeme' },
-    { id: 'chris', password: 'secret' },
-  ];
-
   async findOne(id: string): Promise<User | undefined> {
-    return this.users.find(user => user.id === id);
+    const user = await userSchema.findOne({ nxpid: id });
+    return user;
   }
 
   async setRefreshToken(id: string, refreshToken: string) {
-    const user = this.users.find(user => user.id === id);
+    const user = await userSchema.findOne({ nxpid: id });
     if (user) {
       user.refreshToken = refreshToken;
+      await user.save();
     }
   }
 
   async removeRefreshToken(id: string) {
-    const user = this.users.find(user => user.id === id);
+    const user = await userSchema.findOne({ nxpid: id });
     if (user) {
       user.refreshToken = undefined;
+      await user.save();
     }
   }
 }

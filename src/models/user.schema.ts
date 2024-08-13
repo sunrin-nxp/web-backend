@@ -13,6 +13,7 @@ const userSchema = new mongo.Schema({
     wrong_problems: { type: Array<Number> },
     my_problems: { type: Array<Number> },
     contributed_problems: { type: Array<Number> },
+    refreshToken: { type: String, required: true },
 });
 
 export default mongo.model('user_data', userSchema);

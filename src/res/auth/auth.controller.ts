@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Response } from 'express';
+import { CreateAuthDto } from './dto/createUser.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,7 +26,7 @@ export class AuthController {
   }
 
   @Post('register')
-  async register() {
+  async register(@Body() bd: CreateAuthDto) {
 
   }
 
