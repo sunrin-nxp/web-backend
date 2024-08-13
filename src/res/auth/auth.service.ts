@@ -6,6 +6,9 @@ import { JwtPayload } from '../../interface/jwt-payload.interface';
 import { CreateAuthDto } from './dto/createUser.dto';
 import userSchema from 'src/models/user.schema';
 import { readFile } from 'fs/promises';
+import { UpdateAssociationDto } from './dto/updateAssociation.dto';
+import { UpdateNicknameDto } from './dto/updateNickname.dto';
+import { UpdateDescriptionDto } from './dto/updateDesc.dto';
 
 @Injectable()
 export class AuthService {
@@ -67,6 +70,24 @@ export class AuthService {
     return {
       result: res
     };
+  }
+
+  async updateAssociation(data: UpdateAssociationDto) {
+    const user = await userSchema.findOne({ nxpid: data.id });
+    user.associated = data.association; await user.save();
+    return { result: true };
+  }
+
+  async updateNickname(data: UpdateNicknameDto) {
+    const user = await userSchema.findOne({ nxpid: data.id });
+    user.nickname = data.nickname; await user.save();
+    return { result: true };
+  }
+
+  async updateDescription(data: UpdateDescriptionDto) {
+    const user = await userSchema.findOne({ nxpid: data.id });
+    user.description = data.description; await user.save();
+    return { result: true };
   }
 
   async updateRefreshToken(id: string, refreshToken: string) {
