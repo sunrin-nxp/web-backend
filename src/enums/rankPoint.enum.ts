@@ -1,10 +1,10 @@
 enum rankPoint {
-    none, bronze4, bronze3, bronze2, bronze1,
-    silver3, silver2, silver1,
-    gold3, gold2, gold1,
-    platinum3, platinum2, platinum1,
-    diamond3, diamond2, diamond1,
-    ace, master
+    none, Bronze4, Bronze3, Bronze2, Bronze1,
+    Silver3, Silver2, Silver1,
+    Gold3, Gold2, Gold1,
+    Platinum3, Platinum2, Platinum1,
+    Diamond3, Diamond2, Diamond1,
+    Ace, Master
 };
 
 export default rankPoint;
