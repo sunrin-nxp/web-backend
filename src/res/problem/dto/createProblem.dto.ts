@@ -14,10 +14,10 @@ export class ProblemDto {
     content: string;
 
     @ApiProperty({
-        description: "등록자의 id입니다.",
-        example: "ninejuan"
+        description: "문제의 레벨입니다.",
+        example: "Ace"
     })
-    creatorId: string;
+    rank: string;
 
     @ApiProperty({
         description: "문제의 테스트케이스들입니다.",
@@ -28,4 +28,10 @@ export class ProblemDto {
         ]
     })
     testcases: Array<{ input: string, output: string }>
+
+    @ApiProperty({
+        description: "문제 제작자의 정답 코드입니다.",
+        example: "a, b = map(int, input().split()); print(a+b)"
+    })
+    answer?: string;
 };
