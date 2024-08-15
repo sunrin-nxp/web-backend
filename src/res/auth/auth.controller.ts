@@ -12,10 +12,11 @@ import path from 'path';
 import { UpdateAssociationDto } from './dto/updateAssociation.dto';
 import { UpdateNicknameDto } from './dto/updateNickname.dto';
 import { UpdateDescriptionDto } from './dto/updateDesc.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './upload/profiles');
+    cb(null, './upload');
   },
   filename: (req, file, cb) => {
     const userid = req.body.id;
@@ -29,6 +30,7 @@ const uploadOptions: MulterOptions = {
   storage: storage
 };
 
+@ApiTags("Authentication")
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -54,6 +56,7 @@ export class AuthController {
   }
 
   @Post('profile/:id')
+  @UseGuards(JwtAuthGuard)
   async profilePhoto(@UploadedFile() file: Express.Multer.File, @Param('id') userid: string) {
     return this.authService.profilePhoto(file.filename, userid);
   }
