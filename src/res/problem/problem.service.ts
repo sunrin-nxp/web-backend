@@ -99,7 +99,7 @@ export class ProblemService {
         break;
     }
     return {
-      result: true ? fetchReq.json().result == "정답입니다" : "틀렸습니다",
+      result: true ? fetchReq.json().result == "정답입니다" : false,
       message: fetchReq.json().result
     };
   }
