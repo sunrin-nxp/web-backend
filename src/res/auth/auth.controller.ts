@@ -108,12 +108,42 @@ export class AuthController {
     return this.authService.profilePhoto(file.filename, userid);
   }
 
+  @ApiOperation({
+    summary: "프로필 조회",
+    description: "유저의 프로필을 조회합니다."
+  })
+  @ApiResponse({
+    status: 200,
+    description: "유저 데이터",
+  })
+  @ApiParam({
+    name: "id",
+    example: "ninejuan",
+    required: true
+  })
   @Post('profile/:id')
   @UseGuards(JwtAuthGuard)
   async profile(@Param('id') id: string) {
     return this.authService.profile(id);
   }
 
+  @ApiOperation({
+    summary: "refreshToken 재발급",
+    description: "refreshToken을 갱신합니다."
+  })
+  @ApiResponse({
+    status: 200,
+    description: "유저 액세스 토큰 데이터",
+    schema: {
+      properties: {
+        accessToken: {
+          type: 'String',
+          description: "유저의 새로운 accessToken입니다.",
+          example: "rhiouerfho8v7reni="
+        }
+      }
+    }
+  })
   @Post('refresh')
   async refresh(@Body('refreshToken') refreshToken: string, @Res() res: Response) {
     const tokens = await this.authService.refreshToken(refreshToken);
@@ -128,6 +158,23 @@ export class AuthController {
     return res.json({ accessToken: tokens.accessToken });
   }
 
+  @ApiOperation({
+    summary: "로그아웃",
+    description: "refToken, acToken을 초기화하고 로그아웃합니다."
+  })
+  @ApiResponse({
+    status: 200,
+    description: "유저 액세스 토큰 데이터",
+    schema: {
+      properties: {
+        accessToken: {
+          type: 'String',
+          description: "유저의 새로운 accessToken입니다.",
+          example: "rhiouerfho8v7reni="
+        }
+      }
+    }
+  })
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(@Request() req, @Res() res: Response) {
@@ -137,18 +184,69 @@ export class AuthController {
     return res.json({ message: 'Logged out successfully' });
   }
 
+  @ApiOperation({
+    summary: "소속 학교/회사 변경",
+    description: "유저의 소속 학교/회사 정보를 변경합니다."
+  })
+  @ApiResponse({
+    status: 200,
+    description: "변경 결과",
+    schema: {
+      properties: {
+        result: {
+          type: 'Boolean',
+          description: "변경 결과입니다 (True / False)",
+          example: true
+        }
+      }
+    }
+  })
   @UseGuards(JwtAuthGuard)
   @Post('update/association')
   async updateAssociation(@Body() bd: UpdateAssociationDto) {
     return this.authService.updateAssociation(bd);
   }
 
+  @ApiOperation({
+    summary: "닉네임 변경",
+    description: "유저의 닉네임 정보를 변경합니다."
+  })
+  @ApiResponse({
+    status: 200,
+    description: "변경 결과",
+    schema: {
+      properties: {
+        result: {
+          type: 'Boolean',
+          description: "변경 결과입니다 (True / False)",
+          example: true
+        }
+      }
+    }
+  })
   @UseGuards(JwtAuthGuard)
   @Post('update/nickname')
   async updateNickname(@Body() bd: UpdateNicknameDto) {
     return this.authService.updateNickname(bd);
   }
 
+  @ApiOperation({
+    summary: "소개글 변경",
+    description: "유저의 소개글 정보를 변경합니다."
+  })
+  @ApiResponse({
+    status: 200,
+    description: "변경 결과",
+    schema: {
+      properties: {
+        result: {
+          type: 'Boolean',
+          description: "변경 결과입니다 (True / False)",
+          example: true
+        }
+      }
+    }
+  })
   @UseGuards(JwtAuthGuard)
   @Post('update/description')
   async updateDescription(@Body() bd: UpdateDescriptionDto) {
