@@ -12,7 +12,7 @@ import path from 'path';
 import { UpdateAssociationDto } from './dto/updateAssociation.dto';
 import { UpdateNicknameDto } from './dto/updateNickname.dto';
 import { UpdateDescriptionDto } from './dto/updateDesc.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -35,6 +35,23 @@ const uploadOptions: MulterOptions = {
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiOperation({
+    summary: "로그인",
+    description: "사용자의 계정으로 로그인합니다."
+  })
+  @ApiResponse({
+    status: 200,
+    description: "로그인 성공",
+    schema: {
+      properties: {
+        accessToken: {
+          type: 'String',
+          description: "로그인한  유저의 AccessToken입니다.",
+          example: "asfoiu43h7rvfud=;"
+        }
+      }
+    }
+  })
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req, @Res() res: Response) {
@@ -47,18 +64,54 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
 
-    return res.json({ accessToken });
+    return res.json({ accessToken: accessToken });
   }
 
+  @ApiOperation({
+    summary: "회원가입",
+    description: "새로운 계정을 생성합니다."
+  })
+  @ApiResponse({
+    status: 200,
+    description: "회원가입 성공",
+    schema: {
+      properties: {
+        userId: {
+          type: 'String',
+          description: "가입된 유저의 ID입니다.",
+          example: "ninejuan"
+        }
+      }
+    }
+  })
   @Post('register')
   async register(@Body() bd: CreateAuthDto) {
     return this.authService.register(bd);
   }
 
-  @Post('profile/:id')
+  @ApiOperation({
+    summary: "프로필사진 조회",
+    description: "유저의 프로필 사진을 조회합니다."
+  })
+  @ApiResponse({
+    status: 200,
+    description: "유저 프로필 사진 데이터",
+  })
+  @ApiParam({
+    name: "id",
+    example: "ninejuan",
+    required: true
+  })
+  @Post('profilePhoto/:id')
   @UseGuards(JwtAuthGuard)
   async profilePhoto(@UploadedFile() file: Express.Multer.File, @Param('id') userid: string) {
     return this.authService.profilePhoto(file.filename, userid);
+  }
+
+  @Post('profile/:id')
+  @UseGuards(JwtAuthGuard)
+  async profile(@Param('id') id: string) {
+    return this.authService.profile(id);
   }
 
   @Post('refresh')
