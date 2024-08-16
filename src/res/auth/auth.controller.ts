@@ -46,7 +46,7 @@ export class AuthController {
       properties: {
         accessToken: {
           type: 'String',
-          description: "로그인한  유저의 AccessToken입니다.",
+          description: "로그인한 유저의 AccessToken입니다.",
           example: "asfoiu43h7rvfud=;"
         }
       }
