@@ -9,10 +9,10 @@ const userSchema = new mongo.Schema({
     mailaddr: { type: String, required: true },
     profilePhoto: { type: String, default: "default.png" }, // 저장된 파일명
     rank: { type: String, default: "none" },
-    solved_problems: { type: Array<Number>, default: [] },
-    wrong_problems: { type: Array<Number>, default: [] },
-    my_problems: { type: Array<Number>, default: [] },
-    contributed_problems: { type: Array<Number>, default: [] },
+    solved_problems: { type: Array<String>, default: [] },
+    wrong_problems: { type: Array<String>, default: [] },
+    my_problems: { type: Array<String>, default: [] },
+    contributed_problems: { type: Array<String>, default: [] },
     refreshToken: { type: String, default: "" },
 });
 

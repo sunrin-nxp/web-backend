@@ -7,10 +7,10 @@ interface User {
     mailaddr?: String;
     profilePhoto?: String;
     rank?: String;
-    solved_problems?: Array<Number>;
-    wrong_problems?: Array<Number>;
-    my_problems?: Array<Number>;
-    contributed_problems?: Array<Number>;
+    solved_problems?: Array<String>;
+    wrong_problems?: Array<String>;
+    my_problems?: Array<String>;
+    contributed_problems?: Array<String>;
     refreshToken: String;
 };
 

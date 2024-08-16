@@ -56,6 +56,11 @@ export class AuthService {
     return imgBuffer.buffer;
   }
 
+  async profile(userid: string) {
+    const user = await userSchema.findOne({ nxpid: userid });
+    return user ?? null;
+  }
+
   async profilePhoto(imgFileName: string, userid: string) {
     const user = await userSchema.findOne({ nxpid: userid });
     let res = false;
