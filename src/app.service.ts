@@ -4,13 +4,6 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   async mainPage() {
     return {
-      banner: {
-        background_color: ""  ,
-        boxText: "",
-        title: "",
-        content: "",
-        imgUrl: ""
-      },
       problems: [{ // 제일 최신 문제 50개 반환
 
       }],

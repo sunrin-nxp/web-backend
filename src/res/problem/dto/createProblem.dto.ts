@@ -27,7 +27,7 @@ export class ProblemDto {
             { input: "119 9", output: "128"}
         ]
     })
-    testcases: Array<{ input: string, output: string }>
+    testcases: Array<{ input: number, output: string }>
 
     @ApiProperty({
         description: "문제 제작자의 정답 코드입니다.",

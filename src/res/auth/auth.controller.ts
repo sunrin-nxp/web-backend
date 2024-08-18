@@ -1,5 +1,5 @@
 // src/auth/auth.controller.ts
-import { Request, Controller, Post, UseGuards, Res, Body, UploadedFile, Req, Param } from '@nestjs/common';
+import { Request, Controller, Post, UseGuards, Res, Body, UploadedFile, Req, Param, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -8,11 +8,13 @@ import { CreateAuthDto } from './dto/createUser.dto';
 import * as multer from 'multer';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import * as crypto from 'crypto';
-import path from 'path';
+import * as path from 'path';
 import { UpdateAssociationDto } from './dto/updateAssociation.dto';
 import { UpdateNicknameDto } from './dto/updateNickname.dto';
 import { UpdateDescriptionDto } from './dto/updateDesc.dto';
-import { ApiOperation, ApiParam, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LoginDto } from './dto/Login.dto';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -20,7 +22,9 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const userid = req.body.id;
-    const ext = path.extname(file.originalname);
+    const ext = path.extname(`${file.originalname}`);
+    console.log(ext)
+    // const ext = path.extname(file.originalname);
     const filename = `${userid}-profile-${crypto.randomBytes(16).toString('hex')}${ext}`
     cb(null, filename);
   }
@@ -31,9 +35,10 @@ const uploadOptions: MulterOptions = {
 };
 
 @ApiTags("Authentication")
+@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @ApiOperation({
     summary: "로그인",
@@ -52,19 +57,20 @@ export class AuthController {
       }
     }
   })
-  @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req, @Res() res: Response) {
-    const { accessToken, refreshToken } = await this.authService.login(req.user);
+  async login(@Body() loginDto: LoginDto, @Request() req, @Res() res: Response) {
+    const result = await this.authService.login(loginDto);
+    if (!result) throw new UnauthorizedException();
+    else {
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+      });
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
-    });
-
-    return res.json({ accessToken: accessToken });
+      return res.json({ accessToken: result.accessToken });
+    }
   }
 
   @ApiOperation({
@@ -90,8 +96,8 @@ export class AuthController {
   }
 
   @ApiOperation({
-    summary: "프로필사진 조회",
-    description: "유저의 프로필 사진을 조회합니다."
+    summary: "프로필사진 업로드",
+    description: "유저의 프로필 사진을 등록합니다."
   })
   @ApiResponse({
     status: 200,
@@ -104,7 +110,9 @@ export class AuthController {
   })
   @Post('profilePhoto/:id')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
   async profilePhoto(@UploadedFile() file: Express.Multer.File, @Param('id') userid: string) {
+    console.log(file);
     return this.authService.profilePhoto(file.filename, userid);
   }
 

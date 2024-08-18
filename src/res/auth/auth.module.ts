@@ -7,7 +7,8 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from '../common/strategy/jwt.strategy';
 import { LocalStrategy } from '../common/strategy/local.strategy';
-import { config } from 'dotenv'; config();
+import { config } from 'dotenv';import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+ config();
 
 const env = process.env;
 
@@ -20,7 +21,7 @@ const env = process.env;
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtAuthGuard],
   controllers: [AuthController],
 })
 export class AuthModule {}

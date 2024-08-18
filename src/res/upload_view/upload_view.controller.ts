@@ -2,8 +2,9 @@ import { Controller, Get, Param, Res } from '@nestjs/common';
 import { UploadViewService } from './upload_view.service';
 import { Response } from 'express';
 import { join } from 'path';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Uploads")
 @Controller('upload')
 export class UploadViewController {
   constructor(private readonly uploadService: UploadViewService) {}
