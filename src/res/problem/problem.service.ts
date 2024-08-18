@@ -8,8 +8,8 @@ import userSchema from 'src/models/user.schema';
 import { defaultIfEmpty } from 'rxjs';
 import { RateDto } from './dto/rate.dto';
 import rankPoint from 'src/enums/rankPoint.enum';
-
-
+import { UserStreak, IUserStreak } from '../../models/streak.schema';
+import mongoose from 'mongoose';
 
 config(); const env = process.env;
 
@@ -29,7 +29,7 @@ export class ProblemService {
     await newPb.save();
     return {
       result: true
-    } 
+    }
   }
 
   async getProblem(no: number) {
@@ -70,7 +70,7 @@ export class ProblemService {
     }
   }
 
-  async solveProblem(problemId: number, solutionDto: SolutionDto, userid: number) {
+  async solveProblem(problemId: number, solutionDto: SolutionDto, userid: string) {
     const fetchReq: any = await fetch(`${env.JUDGE_DOMAIN}`, {
       method: "POST",
       body: JSON.stringify({
@@ -82,15 +82,16 @@ export class ProblemService {
     });
     const user = await userSchema.findOne({ nxpid: userid });
     const probNum = problemId.toString();
-    switch(fetchReq.json().result) {
+    switch (fetchReq.json().result) {
       case "정답입니다":
         if (probNum in user.wrong_problems) user.wrong_problems.splice(user.wrong_problems.indexOf(probNum), 1);
         if (!(probNum in user.solved_problems)) user.solved_problems.unshift(probNum);
         await user.save();
+        await this.updateStreak(userid);
         break;
       case "틀렸습니다":
         if (!(probNum in user.wrong_problems)) user.wrong_problems.unshift(probNum);
-        await user.save(); 
+        await user.save();
         break;
       default:
         break;
@@ -111,5 +112,42 @@ export class ProblemService {
     return {
       result: true
     }
+  }
+
+  async updateStreak(userId: string): Promise<IUserStreak | null> {
+    const streak = await UserStreak.findOne({ userId: userId });
+
+    const today = new Date();
+    const todayDate = today.toISOString().split('T')[0];
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const yesterdayDate = yesterday.toISOString().split('T')[0];
+
+    if (!streak) {
+      const newStreak = new UserStreak({
+        userId,
+        currentStreak: 1,
+        longestStreak: 1,
+        lastActiveDate: new Date(todayDate),
+      });
+      return newStreak.save();
+    }
+
+    if (streak.lastActiveDate && streak.lastActiveDate.toISOString().split('T')[0] === todayDate) {
+      return streak;
+    }
+
+    if (streak.lastActiveDate && streak.lastActiveDate.toISOString().split('T')[0] === yesterdayDate) {
+      streak.currentStreak += 1;
+    } else {
+      streak.currentStreak = 1;
+    }
+
+    if (streak.currentStreak > streak.longestStreak) {
+      streak.longestStreak = streak.currentStreak;
+    }
+
+    streak.lastActiveDate = new Date(todayDate);
+    return streak.save();
   }
 }

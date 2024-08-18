@@ -3,9 +3,9 @@ import { ProblemService } from './problem.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { ProblemDto } from './dto/createProblem.dto';
 import { SolutionDto } from './dto/solution.dto';
-import { prototype } from 'events';
 import { RateDto } from './dto/rate.dto';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserStreak, IUserStreak } from '../../models/streak.schema';
 
 @ApiTags("Problem")
 @Controller('problem')
