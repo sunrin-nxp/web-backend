@@ -8,7 +8,7 @@ export interface IUserStreak extends Document {
 }
 
 const UserStreakSchema: Schema = new Schema({
-    userId: { type: mongoose.Types.ObjectId, required: true, unique: true, ref: 'User' },
+    userId: { type: String, required: true, unique: true, ref: 'User' },
     currentStreak: { type: Number, default: 0 },
     longestStreak: { type: Number, default: 0 },
     lastActiveDate: { type: Date, default: null }

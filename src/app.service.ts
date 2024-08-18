@@ -1,30 +1,28 @@
 import { Injectable } from '@nestjs/common'; 
+import { ProblemService } from './res/problem/problem.service';
 
 @Injectable()
 export class AppService {
-  async mainPage() {
+  constructor(
+    private problemService: ProblemService
+  ) { }
+  async getDefaultMainPage() {
+    // 대강 로그인하라는 페이지를 만들까
+    // 
     return {
-      problems: [{ // 제일 최신 문제 50개 반환
 
-      }],
-      streak: "",
-      dailyQuest: [
-        {
-          title: "생일 케이크 만들기",
-          rank: "Silver3",
-          solved: true
-        },
-        {
-          title: "선린냥이지기",
-          rank: "Platinum1",
-          solved: false
-        },
-        {
-          title: "비가 주륵 내리고 나면",
-          rank: "Master",
-          solved: false
-        }
-      ]
+    }
+  }
+
+  async getUserMainPage(userid: string) {
+    const userStreak = await this.problemService.getCurrentStreak(userid);
+    const recommendProblems = await this.problemService.getRecommendedProblems(userid);
+    const getRecentProblems = await this.problemService.getRecentProblems(50);
+    // 생각해보니 문제 검색 구현해야하는데
+    return {
+      problems: getRecentProblems,
+      streak: userStreak,
+      dailyQuest: recommendProblems
     };
   }
 }
