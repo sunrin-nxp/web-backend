@@ -1,7 +1,6 @@
-import cron from 'node-cron';
 import { UserStreak } from '../models/streak.schema';
 
-async function checkStreaks() {
+export async function checkStreaks() {
     const allStreaks = await UserStreak.find();
     
     const today = new Date();
@@ -17,8 +16,3 @@ async function checkStreaks() {
         }
     }
 }
-
-// 매일 자정에 실행
-cron.schedule('0 0 * * *', () => {
-    checkStreaks();
-});
