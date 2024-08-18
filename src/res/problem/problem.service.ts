@@ -17,22 +17,19 @@ config(); const env = process.env;
 export class ProblemService {
   async createProblem(createProblemDto: ProblemDto, userid: string) {
     const problemNumber = await newProblemNumber();
-    await new problemsSchema({
+    const newPb = await new problemsSchema({
       creator: userid,
       problemNumber: problemNumber,
       subject: createProblemDto.subject,
       content: createProblemDto.content,
       testcases: createProblemDto.testcases,
       rankPoint: createProblemDto.rank
-    }).save().then(() => {
-      return {
-        result: true
-      }
-    }).catch((e) => {
-      return {
-        result: false
-      }
     });
+    if (createProblemDto.answer) newPb.answerCode = createProblemDto.answer;
+    await newPb.save();
+    return {
+      result: true
+    } 
   }
 
   async getProblem(no: number) {
@@ -108,7 +105,8 @@ export class ProblemService {
     const problem = await problemsSchema.findOne({ problemNumber: problemId });
     let filteredRates: any = problem.userRate.filter(item => item.userid !== userid);
     filteredRates.unshift({ userid: userid, votedRank: rateDto.votedRank, comment: rateDto.comment });
-    problem.rankPoint = rankPoint[Math.round(rankPoint[problem.rankPoint] + rankPoint[rateDto.votedRank])];
+    problem.userRate = filteredRates;
+    problem.rankPoint = rankPoint[Math.round((rankPoint[problem.rankPoint] + rankPoint[rateDto.votedRank]) / 2)];
     await problem.save();
     return {
       result: true

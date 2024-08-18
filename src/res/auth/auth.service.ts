@@ -9,6 +9,7 @@ import { readFile } from 'fs/promises';
 import { UpdateAssociationDto } from './dto/updateAssociation.dto';
 import { UpdateNicknameDto } from './dto/updateNickname.dto';
 import { UpdateDescriptionDto } from './dto/updateDesc.dto';
+import { LoginDto } from './dto/Login.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,15 +19,23 @@ export class AuthService {
   ) { }
 
   async validateUser(id: string, password: string): Promise<any> {
-    const user = await this.userService.findOne(id);
-    if (user && user.nxppw === password) {
+    console.log('a')
+    const user = await userSchema.findOne({ nxpid: id });
+    console.log(user);
+    if (user && user.nxppw == password) {
+      console.log('h')
       const { nxppw, ...result } = user;
       return result;
+    } else {
+      console.log('b')
+      return null;
     }
-    return null;
   }
 
-  async login(user: any) {
+  async login(user: LoginDto) {
+    const validate = this.validateUser(user.id, user.pw);
+    if (!validate) return null;
+
     const payload: JwtPayload = { id: user.id };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });

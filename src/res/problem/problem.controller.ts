@@ -5,8 +5,9 @@ import { ProblemDto } from './dto/createProblem.dto';
 import { SolutionDto } from './dto/solution.dto';
 import { prototype } from 'events';
 import { RateDto } from './dto/rate.dto';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Problem")
 @Controller('problem')
 export class ProblemController {
   constructor(private readonly problemService: ProblemService) {}
@@ -31,6 +32,7 @@ export class ProblemController {
   @Post('register')
   @UseGuards(JwtAuthGuard)
   async create(@Body() createProblemDto: ProblemDto, @Req() req) {
+    console.log(req.id)
     return this.problemService.createProblem(createProblemDto, req.id);
   }
 
@@ -52,7 +54,7 @@ export class ProblemController {
     }
   })
   @ApiParam({
-    name: "문제 ID",
+    name: "id",
     example: "10001",
     description: "채점할 문제의 ID입니다.",
     type: "Number"
@@ -81,7 +83,7 @@ export class ProblemController {
     }
   })
   @ApiParam({
-    name: "문제 ID",
+    name: "id",
     example: "10001",
     description: "평가할 문제의 ID입니다.",
     type: "Number"
@@ -150,7 +152,7 @@ export class ProblemController {
     }
   })
   @ApiParam({
-    name: "문제 ID",
+    name: "id",
     example: "10001",
     description: "정보를 받을 문제의 ID입니다.",
     type: "Number"
@@ -178,12 +180,12 @@ export class ProblemController {
     }
   })
   @ApiParam({
-    name: "문제 ID",
+    name: "id",
     example: "10001",
     description: "수정할 문제의 ID입니다.",
     type: "Number"
   })
-  @Put('id')
+  @Put(':id')
   @UseGuards(JwtAuthGuard)
   async editProblem(@Param('id') id: number, @Body() editProblemDto: ProblemDto, @Req() req) {
     return this.problemService.editProblem(id, editProblemDto, req.id);
@@ -207,7 +209,7 @@ export class ProblemController {
     }
   })
   @ApiParam({
-    name: "문제 ID",
+    name: "id",
     example: "10001",
     description: "삭제할 문제의 ID입니다.",
     type: "Number"
