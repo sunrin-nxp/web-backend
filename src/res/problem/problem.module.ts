@@ -17,5 +17,6 @@ const env = process.env;
   ],
   controllers: [ProblemController],
   providers: [ProblemService],
+  exports: [ProblemService]
 })
 export class ProblemModule {}

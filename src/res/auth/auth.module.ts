@@ -23,5 +23,9 @@ const env = process.env;
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, JwtAuthGuard],
   controllers: [AuthController],
+  exports: [JwtAuthGuard, JwtModule.register({
+    secret: env.JWT_SECRET,
+    signOptions: { expiresIn: '1d' },
+  }),]
 })
 export class AuthModule {}
