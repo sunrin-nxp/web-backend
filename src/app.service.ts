@@ -7,11 +7,12 @@ export class AppService {
     private problemService: ProblemService
   ) { }
   async getDefaultMainPage() {
-    // 대강 로그인하라는 페이지를 만들까
-    // 
+    const getRecentProblems = await this.problemService.getRecentProblems(50);
     return {
-
-    }
+      problems: getRecentProblems,
+      streak: "?",
+      dailyQuest: "로그인을 해주세요"
+    };
   }
 
   async getUserMainPage(userid: string) {
