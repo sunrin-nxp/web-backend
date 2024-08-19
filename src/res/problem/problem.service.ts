@@ -9,6 +9,7 @@ import { defaultIfEmpty } from 'rxjs';
 import { RateDto } from './dto/rate.dto';
 import rankPoint from 'src/enums/rankPoint.enum';
 import { UserStreak, IUserStreak } from '../../models/streak.schema';
+import questSchema from 'src/models/quest.schema';
 config(); const env = process.env;
 
 @Injectable()
@@ -155,16 +156,8 @@ export class ProblemService {
   }
 
   async getRecommendedProblems(userId: string) {
-    let rparr = []; // Logic: Problem enum 값에서 최대 가중치 +- 3
-    const user = await userSchema.findOne({ nxpid: userId });
-    const minRankIndex = Math.max(rankPoint[user.rank] - 3, rankPoint.none);
-    const maxRankIndex = Math.min(rankPoint[user.rank] + 3, rankPoint.Master);
-
-    let problems = (await problemsSchema.find()).filter(problem => {
-      const problemRankIndex = Object.values(rankPoint).indexOf(problem.rankPoint);
-      return problemRankIndex >= minRankIndex && problemRankIndex <= maxRankIndex;
-    });
-    return problems;
+    let dailyQuest = await questSchema.findOne({ userid: userId });
+    return dailyQuest;
   }
 
   async getRecentProblems(count: number) {
