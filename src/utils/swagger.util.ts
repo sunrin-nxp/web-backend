@@ -1,4 +1,4 @@
-import { INestApplication } from "@nestjs/common";
+import { ConsoleLogger, INestApplication } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 
 const env = process.env;
@@ -16,5 +16,6 @@ export function setupSwagger(app: INestApplication) {
     .addTag(`${env.TAG}`)
     .build();
   const document = SwaggerModule.createDocument(app, config);
+  console.log(`${env.SWAGGER_URI}`)
   SwaggerModule.setup(`${env.SWAGGER_URI}`, app, document);
 }
